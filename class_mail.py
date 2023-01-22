@@ -6,12 +6,11 @@ from email.mime.multipart import MIMEMultipart
 import pandas as pd
 from email.mime.application import MIMEApplication
 from pretty_html_table import build_table
-# root password
 import mysql.connector
 import pymysql
 import os
 
-class SendMail2():
+class SendMail():
     
     def __init__(self,sender,receiver,subject,query,length):
         self.sender=sender
@@ -25,7 +24,7 @@ class SendMail2():
     def MySQLConnect():
         mydb = mysql.connector.connect(
             user='mateusz'
-            ,password=os.environ["mmysql_password"]
+            ,password=os.environ["mysql_password"]
             ,host='localhost'
             ,database='python'
         )
@@ -67,7 +66,7 @@ class SendMail2():
         message['From']=self.sender
         message['To']=self.receiver
         message.attach(MIMEText(body,'html'))
-        server.login('matbak177@gmail.com','uldcsafhahxsdwgo')
+        server.login(self.sender,os.environ["mail_password"])
         
         if self.liczba>self.length:
             attachment=MIMEApplication(self.read_data().to_csv())
@@ -75,27 +74,10 @@ class SendMail2():
             message.attach(attachment)
         
         try:
-            server.sendmail('matbak177@gmail.com',self.receiver,message.as_string())
+            server.sendmail(self.sender,self.receiver,message.as_string())
             print('udalo sie')
         except smtplib.SMTPException as e:
             print(str(e))
         server.quit()
             
-x=SendMail2('matbak177@gmail.com','mat177@onet.eu','List of users','Select * from mail',5)
-
-x.send_notification()
-# x.table()
-
-#przekazywac liczbe 
-# jak przekazywac body?
-
-
-
-
-
-
-
-
-
-
-
+SendMail('matbak177@gmail.com','mat177@onet.eu','List of users','Select * from mail',5).send_notification()
