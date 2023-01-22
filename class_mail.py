@@ -37,7 +37,6 @@ class SendMail():
     
     def table(self):
         tabela=""
-    
         self.liczba = len(self.read_data())
         
         if self.liczba <self.length:
@@ -47,7 +46,7 @@ class SendMail():
                     <p>{tabela}</p>
                     </hrml>
                     """.format(tabela=build_table(self.read_data(),color='blue_light',font_size='small',font_family='Arial'))
-    
+
         return tabela
 
     def send_notification(self):
@@ -80,4 +79,4 @@ class SendMail():
             print(str(e))
         server.quit()
             
-SendMail('matbak177@gmail.com','mat177@onet.eu','List of users','Select * from mail',5).send_notification()
+SendMail('matbak177@gmail.com','mat177@onet.eu','List of users','Select * from mail',10).send_notification()

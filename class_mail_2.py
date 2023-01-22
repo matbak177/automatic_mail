@@ -6,22 +6,21 @@ from email.mime.multipart import MIMEMultipart
 import pandas as pd
 from email.mime.application import MIMEApplication
 from pretty_html_table import build_table
-# root password
 import mysql.connector
 import pymysql
 import os
 
 class SendMail():
     
-    # def __init__(self):
-    #     self.receiver=receiver
-    #     self.query=query
+    def __init__(self,sender,receivers_q,data):
+        self.sender=sender
+        self.receivers_q=receivers_q
     
     @staticmethod
     def MySQLConnect():
         mydb = mysql.connector.connect(
             user='mateusz'
-            ,password=os.environ["mmysql_password"]
+            ,password=os.environ["mysql_password"]
             ,host='localhost'
             ,database='python'
         )
@@ -31,7 +30,7 @@ class SendMail():
     def Receiver(self):
         mydb=self.MySQLConnect()
         receiver_query=mydb.cursor()
-        receiver_query.execute("Select distinct email,imie as email from mail")
+        receiver_query.execute(self.receivers_q)
         receiver_query = receiver_query.fetchall()
         receiver=pd.DataFrame(receiver_query)
         receivers=receiver.values.tolist()
@@ -75,7 +74,7 @@ class SendMail():
             message['From']='Analyst - Mateusz'
             message['To']=i[0]
             message.attach(MIMEText(body,'html'))
-            server.login('matbak177@gmail.com','uldcsafhahxsdwgo')
+            server.login(self.sender,os.environ["mail_password"])
             
             if liczba>3:
                 attachment=MIMEApplication(df.to_csv())
@@ -83,25 +82,12 @@ class SendMail():
                 message.attach(attachment)
             
             try:
-                server.sendmail('matbak177@gmail.com',i[0],message.as_string())
+                server.sendmail(self.sender,i[0],message.as_string())
                 print('udalo sie')
             except smtplib.SMTPException as e:
                 print(str(e))
             server.quit()
             
-            break
-        # return df
+            break #to delete
 
-y=SendMail()
-y.execute()
-
-
-
-
-
-
-
-
-
-
-
+SendMail('matbak177@gmail.com',"Select distinct email,imie as email from mail",).execute()
